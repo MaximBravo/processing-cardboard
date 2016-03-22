@@ -2,6 +2,7 @@ package processing.cardboard;
 
 import com.google.vrtoolkit.cardboard.CardboardActivity;
 import com.google.vrtoolkit.cardboard.CardboardView;
+import com.google.vrtoolkit.cardboard.HeadMountedDisplayManager;
 
 import android.app.ActivityManager;
 import android.content.Context;
@@ -35,9 +36,8 @@ public class PCardboard extends CardboardActivity implements PContainer {
   }
 
   public void initDimensions() {
-    metrics = new DisplayMetrics();
-    getResources().getDisplayMetrics();
-
+//    metrics = new DisplayMetrics();
+    metrics = getResources().getDisplayMetrics();
   }
 
   public int getWidth() {
@@ -54,6 +54,26 @@ public class PCardboard extends CardboardActivity implements PContainer {
 
   public void setSketch(PApplet sketch) {
     this.sketch = sketch;
+  }
+
+  public void init(PApplet sketch) {
+    setSketch(sketch);
+    if (sketch != null) {
+      view = new GLCardboardSurfaceView(this);
+      view.setRestoreGLStateEnabled(false);
+      view.setDistortionCorrectionEnabled(false);
+      //cardboardView.setDistortionCorrectionEnabled(true);
+      view.setChromaticAberrationCorrectionEnabled(false);
+      //cardboardView.setChromaticAberrationCorrectionEnabled(true);
+      //cardboardView.setVRModeEnabled(false); // sets Monocular mode
+      sketch.initSurface(PCardboard.this, view);
+      view.initRenderer();
+      setCardboardView(view);
+
+      // Don't start Papplet's animation thread bc cardboard will drive rendering
+      // continuously
+//      sketch.start();
+    }
   }
 
   public class GLCardboardSurfaceView extends CardboardView {
@@ -93,11 +113,12 @@ public class PCardboard extends CardboardActivity implements PContainer {
         setEGLConfigChooser(surf.getConfigChooser(quality));
       }
       // The renderer can be set only once.
-      setRenderer(surf.getCardboardRenderer());
-//      setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
-
+//      setRenderer(surf.getCardboardRenderer());
+      setRenderer(surf.getCardboardStereoRenderer());
+//
       // Cardboard needs to run with its own loop.
       setRenderMode(GLSurfaceView.RENDERMODE_CONTINUOUSLY);
+//      setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
     }
 
     @Override
@@ -137,24 +158,6 @@ public class PCardboard extends CardboardActivity implements PContainer {
     }
   }
 
-  public void init(PApplet sketch) {
-    setSketch(sketch);
-    if (sketch != null) {
-      view = new GLCardboardSurfaceView(PCardboard.this);
-      view.setDistortionCorrectionEnabled(false);
-      //cardboardView.setDistortionCorrectionEnabled(true);
-      view.setChromaticAberrationCorrectionEnabled(false);
-      //cardboardView.setChromaticAberrationCorrectionEnabled(true);
-      //cardboardView.setVRModeEnabled(false); // sets Monocular mode
-      sketch.initSurface(PCardboard.this, view);
-      view.initRenderer();
-
-      // Don't start Papplet's animation thread bc cardboard will drive rendering
-      // continuously
-//      sketch.start();
-    }    
-  }
-  
   /*
    * Called with the activity is first created.
    */
@@ -197,13 +200,13 @@ public class PCardboard extends CardboardActivity implements PContainer {
    @Override
    public void onStart() {
      super.onStart();
-     sketch.onStart();
+//     sketch.onStart();
    }
 
 
    @Override
    public void onStop() {
-     sketch.onStop();
+//     sketch.onStop();
      super.onStop();
    }
 
