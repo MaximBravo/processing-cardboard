@@ -4,8 +4,8 @@ import com.google.vrtoolkit.cardboard.Eye;
 import com.google.vrtoolkit.cardboard.HeadTransform;
 import com.google.vrtoolkit.cardboard.Viewport;
 
-import android.view.SurfaceView;
-import processing.app.PContainer;
+import android.view.SurfaceHolder;
+import processing.android.AppComponent;
 import processing.core.PMatrix3D;
 import processing.core.PSurface;
 import processing.opengl.PGL;
@@ -33,8 +33,8 @@ public class PGraphicsCardboard extends PGraphics3D {
 //    return new PGLcdb(pg);
   }
   
-  public PSurface createSurface(PContainer container, SurfaceView view) {  // ignore
-    return new PSurfaceCardboard(this, container, view);
+  public PSurface createSurface(AppComponent component, SurfaceHolder holder) {  // ignore
+    return new PSurfaceCardboard(this, component, holder);
   }
   
   public void setLeftEye() {
