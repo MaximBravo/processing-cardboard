@@ -5,6 +5,7 @@ import com.google.vrtoolkit.cardboard.HeadTransform;
 import com.google.vrtoolkit.cardboard.Viewport;
 
 import android.view.SurfaceHolder;
+import android.view.SurfaceView;
 import processing.android.AppComponent;
 import processing.core.PMatrix3D;
 import processing.core.PSurface;

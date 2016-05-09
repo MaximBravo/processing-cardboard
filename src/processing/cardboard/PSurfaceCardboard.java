@@ -30,6 +30,7 @@ import processing.opengl.PSurfaceGLES;
 import android.view.Window;
 import android.view.WindowManager;
 import android.util.Log;
+import android.view.SurfaceView;
 
 public class PSurfaceCardboard extends PSurfaceGLES {
   private static final String TAG = "PSurfaceCardboard";
@@ -38,8 +39,8 @@ public class PSurfaceCardboard extends PSurfaceGLES {
   protected PGraphicsCardboard pgc;
   
   protected CardboardActivity cardboard;
-  protected static AndroidCardboardRenderer cardboardRenderer;
-  protected static AndroidCardboardStereoRenderer cardboardStereoRenderer;
+//  protected AndroidCardboardRenderer cardboardRenderer;
+  protected AndroidCardboardStereoRenderer cardboardStereoRenderer;
 
   public PSurfaceCardboard(PGraphics graphics, AppComponent component, SurfaceHolder holder) {
     this.sketch = graphics.parent;
@@ -53,11 +54,11 @@ public class PSurfaceCardboard extends PSurfaceGLES {
     glview = new GLCardboardSurfaceView(cardboard);
     glview.setRestoreGLStateEnabled(false);
     glview.setDistortionCorrectionEnabled(false);
-    //v.setDistortionCorrectionEnabled(true);
-    glview.setChromaticAberrationCorrectionEnabled(false);
+//    glview.setDistortionCorrectionEnabled(true);
+//    glview.setChromaticAberrationCorrectionEnabled(false);
     cardboard.setCardboardView(glview);
 
-    surface = glview;
+    surface = null;
   }
   
   @Override
@@ -74,35 +75,6 @@ public class PSurfaceCardboard extends PSurfaceGLES {
   }
 
   public void initView(int sketchWidth, int sketchHeight) {
-/*
-      int displayWidth = container.getWidth();
-      int displayHeight = container.getHeight();
-      View rootView;
-      if (sketchWidth == displayWidth && sketchHeight == displayHeight) {
-        // If using the full screen, don't embed inside other layouts
-//        window.setContentView(surfaceView);
-        rootView = getSurfaceView();
-      } else {
-        // If not using full screen, setup awkward view-inside-a-view so that
-        // the sketch can be centered on screen. (If anyone has a more efficient
-        // way to do this, please file an issue on Google Code, otherwise you
-        // can keep your "talentless hack" comments to yourself. Ahem.)
-        RelativeLayout overallLayout = new RelativeLayout(activity);
-        RelativeLayout.LayoutParams lp =
-          new RelativeLayout.LayoutParams(LayoutParams.WRAP_CONTENT,
-                                          LayoutParams.WRAP_CONTENT);
-        lp.addRule(RelativeLayout.CENTER_IN_PARENT);
-
-        LinearLayout layout = new LinearLayout(activity);
-        layout.addView(getSurfaceView(), sketchWidth, sketchHeight);
-        overallLayout.addView(layout, lp);
-//        window.setContentView(overallLayout);
-        rootView = overallLayout;
-      }
-      setRootView(rootView);
-      */
-
-
     Window window = cardboard.getWindow();
 
     // Take up as much area as possible
@@ -116,7 +88,7 @@ public class PSurfaceCardboard extends PSurfaceGLES {
     window.setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
             WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
-    window.setContentView(surface);
+    window.setContentView(glview);
   }
 
   public String getName() {
@@ -183,7 +155,7 @@ public class PSurfaceCardboard extends PSurfaceGLES {
 
   public class GLCardboardSurfaceView extends CardboardView {
 //    PGraphicsOpenGL g3;
-    SurfaceHolder surfaceHolder;
+//    SurfaceHolder surfaceHolder;
 
     public GLCardboardSurfaceView(Context context) {
       super(context);
@@ -197,14 +169,14 @@ public class PSurfaceCardboard extends PSurfaceGLES {
         throw new RuntimeException("OpenGL ES 2.0 is not supported by this device.");
       }
 
-      surfaceHolder = getHolder();
-      // are these two needed?
-      surfaceHolder.addCallback(this);
-      surfaceHolder.setType(SurfaceHolder.SURFACE_TYPE_GPU);
+//      surfaceHolder = getHolder();
+//      // are these two needed?
+//      surfaceHolder.addCallback(this);
+//      surfaceHolder.setType(SurfaceHolder.SURFACE_TYPE_GPU);
 
       // Tells the default EGLContextFactory and EGLConfigChooser to create an GLES2 context.
-      setEGLContextClientVersion(2);
-      setPreserveEGLContextOnPause(true);
+//      setEGLContextClientVersion(2);
+//      setPreserveEGLContextOnPause(true);
 
       setFocusable(true);
       setFocusableInTouchMode(true);
@@ -212,17 +184,18 @@ public class PSurfaceCardboard extends PSurfaceGLES {
 
       int quality = sketch.sketchQuality();
       if (1 < quality) {
-        setEGLConfigChooser(getConfigChooser(quality));
+        setEGLConfigChooser(8, 8, 8, 8, 16, 1);
       }
       // The renderer can be set only once.
 //      setRenderer(surf.getCardboardRenderer());
       setRenderer(getCardboardStereoRenderer());
 //
       // Cardboard needs to run with its own loop.
-      setRenderMode(GLSurfaceView.RENDERMODE_CONTINUOUSLY);
+//      setRenderMode(GLSurfaceView.RENDERMODE_CONTINUOUSLY);
 //      setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
     }
 
+    /*
     @Override
     public void surfaceChanged(SurfaceHolder holder, int format, int w, int h) {
       super.surfaceChanged(holder, format, w, h);
@@ -239,6 +212,7 @@ public class PSurfaceCardboard extends PSurfaceGLES {
       // will trigger onSurfaceChanged in the renderer, which calls setSize().
       // -- apparently not true? (100110)
     }
+*/
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
@@ -264,10 +238,10 @@ public class PSurfaceCardboard extends PSurfaceGLES {
 
   // Android specific classes (Renderer, ConfigChooser)  
 
-  public AndroidCardboardRenderer getCardboardRenderer() {
-    cardboardRenderer = new AndroidCardboardRenderer();
-    return cardboardRenderer;
-  }
+//  public AndroidCardboardRenderer getCardboardRenderer() {
+//    cardboardRenderer = new AndroidCardboardRenderer();
+//    return cardboardRenderer;
+//  }
 
   public AndroidCardboardStereoRenderer getCardboardStereoRenderer() {
     cardboardStereoRenderer = new AndroidCardboardStereoRenderer();
@@ -356,6 +330,4 @@ public class PSurfaceCardboard extends PSurfaceGLES {
       
     }
   }
-  
-  
 }

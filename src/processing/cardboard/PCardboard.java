@@ -1,10 +1,21 @@
 package processing.cardboard;
 
 import com.google.vrtoolkit.cardboard.CardboardActivity;
+import com.google.vrtoolkit.cardboard.CardboardView;
+import com.google.vrtoolkit.cardboard.HeadMountedDisplayManager;
+
+import android.app.ActivityManager;
+import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ConfigurationInfo;
+import android.opengl.GLSurfaceView;
+import android.os.Bundle;
 import android.util.DisplayMetrics;
+import android.view.MotionEvent;
+import android.view.SurfaceHolder;
 import processing.android.AppComponent;
 import processing.core.PApplet;
+import processing.opengl.PGraphicsOpenGL;
 
 // http://pastebin.com/6wPgFYhq
 public class PCardboard extends CardboardActivity implements AppComponent {
@@ -19,12 +30,10 @@ public class PCardboard extends CardboardActivity implements AppComponent {
   }
 
   public PCardboard(PApplet sketch) {
-    System.err.println("-----> PCardboard CONSTRUCTOR: " + sketch);
     this.sketch = sketch;
   }
 
   public void initDimensions() {
-//    metrics = new DisplayMetrics();
     metrics = getResources().getDisplayMetrics();
   }
 
@@ -54,7 +63,7 @@ public class PCardboard extends CardboardActivity implements AppComponent {
 
       // Don't start Papplet's animation thread bc cardboard will drive rendering
       // continuously
-      sketch.start();
+      sketch.startSurface();
     }
   }
 

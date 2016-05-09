@@ -29,7 +29,7 @@
 	   srcdir="src" destdir="bin"
 	   encoding="UTF-8"
 	   includeAntRuntime="false"
-	   classpath="libs/cardboard.jar;../../git/processing-android/android-core.zip;${env.ANDROID_SDK}/platforms/android-19/android.jar"
+	   classpath="lib/cardboard-audio-classes.jar;lib/cardboard-common-classes.jar;lib/cardboard-core-classes.jar;../../git/processing-android/android-core.zip;${env.ANDROID_SDK}/platforms/android-19/android.jar"
 	   nowarn="true"
 	   compiler="org.eclipse.jdt.core.JDTCompilerAdapter">
       <compilerclasspath path="../../git/processing/java/mode/org.eclipse.jdt.core.jar;../../git/processing/java/mode/jdtCompilerAdapter.jar" />
