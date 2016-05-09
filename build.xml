@@ -1,16 +1,16 @@
 <?xml version="1.0"?>
-<project name="Cardboard Library for Processing Android" default="build">
+<project name="Processing Cardboard Library" default="build">
 
   <property name="processing.dir" value="../../git/processing" />
   <property environment="env"/>
 
   <target name="clean" description="Clean the build directories">
     <delete dir="bin" />
-    <delete file="library/processing-cardboard.jar" />
+    <delete file="library/cardboard.jar" />
   </target>
 
   <target name="build" depends="sdk_chatter,compile" description="Build cardboard library for Processing Android" >
-  	<jar basedir="bin" destfile="library/processing-cardboard.jar" />
+  	<jar basedir="bin" destfile="library/cardboard.jar" />
   </target>
 
   <target name="sdk_chatter" unless="env.ANDROID_SDK">
@@ -37,25 +37,25 @@
   </target>
 
   <target name="dist" depends="build" description="Creates distribution package">
-    <mkdir dir="dist/tmp/processing-cardboard" />
+    <mkdir dir="dist/tmp/cardboard" />
     
    	<!-- copy library files (jar and gstreamer natives) -->
-  	<copy todir="dist/tmp/processing-cardboard/library">
+  	<copy todir="dist/tmp/cardboard/library">
   		<fileset dir="library" />
 	</copy>
     
   	<!-- copy examples -->
-  	<copy todir="dist/tmp/processing-cardboard/examples">
+  	<copy todir="dist/tmp/cardboard/examples">
   		<fileset dir="examples" />
 	</copy>
 
   	<!-- copy source -->
-    <copy todir="dist/tmp/processing-cardboard/src">
+    <copy todir="dist/tmp/cardboard/src">
   		<fileset dir="src" />
 	</copy>	
   	
     <!-- copy properties -->
-    <copy file="library.properties" tofile="dist/tmp/processing-cardboard/library.properties" />
+    <copy file="library.properties" tofile="dist/tmp/cardboard/library.properties" />
     
     <!-- create the java reference of the library -->
     <!--
@@ -77,8 +77,8 @@
 	</javadoc>    -->
         
     <!-- create zip package -->
-    <delete file="dist/processing-cardboard.zip"/>
-	<zip destfile="dist/processing-cardboard.zip"
+    <delete file="dist/cardboard.zip"/>
+	<zip destfile="dist/cardboard.zip"
   		basedir="dist/tmp"
   		excludes="**/.DS_Store"
 	/>
