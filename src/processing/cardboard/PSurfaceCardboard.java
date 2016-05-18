@@ -1,3 +1,25 @@
+/* -*- mode: java; c-basic-offset: 2; indent-tabs-mode: nil -*- */
+
+/*
+  Part of the Processing project - http://processing.org
+
+  Copyright (c) 2016 The Processing Foundation
+
+  This library is free software; you can redistribute it and/or
+  modify it under the terms of the GNU Lesser General Public
+  License as published by the Free Software Foundation, version 2.1.
+
+  This library is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+  Lesser General Public License for more details.
+
+  You should have received a copy of the GNU Lesser General
+  Public License along with this library; if not, write to the
+  Free Software Foundation, Inc., 59 Temple Place, Suite 330,
+  Boston, MA  02111-1307  USA
+*/
+
 package processing.cardboard;
 
 import java.io.File;
@@ -18,31 +40,24 @@ import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.pm.ConfigurationInfo;
 import android.content.res.AssetManager;
-import android.opengl.GLSurfaceView;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import processing.android.AppComponent;
-import processing.core.PApplet;
 import processing.core.PGraphics;
 import processing.opengl.PGLES;
 import processing.opengl.PGraphicsOpenGL;
 import processing.opengl.PSurfaceGLES;
 import android.view.Window;
 import android.view.WindowManager;
-import android.util.Log;
-import android.view.SurfaceView;
 
 public class PSurfaceCardboard extends PSurfaceGLES {
-  private static final String TAG = "PSurfaceCardboard";
-
   protected GLCardboardSurfaceView glview;
   protected PGraphicsCardboard pgc;
   
   protected CardboardActivity cardboard;
-//  protected AndroidCardboardRenderer cardboardRenderer;
-  protected AndroidCardboardStereoRenderer cardboardStereoRenderer;
+  protected AndroidCardboardStereoRenderer renderer;
 
-  public PSurfaceCardboard(PGraphics graphics, AppComponent component, SurfaceHolder holder) {
+  public PSurfaceCardboard(PGraphics graphics, AppComponent component, SurfaceHolder holder, boolean vr) {
     this.sketch = graphics.parent;
     this.graphics = graphics;
     this.component = component;
@@ -52,10 +67,8 @@ public class PSurfaceCardboard extends PSurfaceGLES {
     pgc = (PGraphicsCardboard)graphics;
 
     glview = new GLCardboardSurfaceView(cardboard);
-    glview.setRestoreGLStateEnabled(false);
     glview.setDistortionCorrectionEnabled(false);
-//    glview.setDistortionCorrectionEnabled(true);
-//    glview.setChromaticAberrationCorrectionEnabled(false);
+    glview.setVRModeEnabled(vr);
     cardboard.setCardboardView(glview);
 
     surface = null;
@@ -82,11 +95,11 @@ public class PSurfaceCardboard extends PSurfaceGLES {
     // the above line does not seem to be needed when using cardboard
     //  android:theme="@android:style/Theme.Holo.NoActionBar.Fullscreen" >
     window.setFlags(WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN,
-            WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN);
+                    WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN);
 
     // This does the actual full screen work
     window.setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
-            WindowManager.LayoutParams.FLAG_FULLSCREEN);
+                    WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
     window.setContentView(glview);
   }
@@ -118,7 +131,6 @@ public class PSurfaceCardboard extends PSurfaceGLES {
   }
 
   public void dispose() {
-    // TODO Auto-generated method stub
 //    surface.onDestroy();
   }
 
@@ -126,37 +138,41 @@ public class PSurfaceCardboard extends PSurfaceGLES {
 
   // Thread handling
 
+  private boolean running = false;
 
   @Override
-  public void startThread() { }
+  public void startThread() {
+    glview.onResume();
+    running = true;
+  }
 
   @Override
   public void pauseThread() {
     glview.onPause();
+    running = false;
   }
 
   @Override
   public void resumeThread() {
     glview.onResume();
+    running = true;
   }
 
   @Override
   public boolean stopThread() {
     glview.onPause();
+    running = false;
     return true;
   }
 
   @Override
   public boolean isStopped() {
-    return false; // no
+    return !running;
   }
 
   ///////////////////////////////////////////////////////////
 
   public class GLCardboardSurfaceView extends CardboardView {
-//    PGraphicsOpenGL g3;
-//    SurfaceHolder surfaceHolder;
-
     public GLCardboardSurfaceView(Context context) {
       super(context);
 
@@ -169,15 +185,6 @@ public class PSurfaceCardboard extends PSurfaceGLES {
         throw new RuntimeException("OpenGL ES 2.0 is not supported by this device.");
       }
 
-//      surfaceHolder = getHolder();
-//      // are these two needed?
-//      surfaceHolder.addCallback(this);
-//      surfaceHolder.setType(SurfaceHolder.SURFACE_TYPE_GPU);
-
-      // Tells the default EGLContextFactory and EGLConfigChooser to create an GLES2 context.
-//      setEGLContextClientVersion(2);
-//      setPreserveEGLContextOnPause(true);
-
       setFocusable(true);
       setFocusableInTouchMode(true);
       requestFocus();
@@ -189,10 +196,6 @@ public class PSurfaceCardboard extends PSurfaceGLES {
       // The renderer can be set only once.
 //      setRenderer(surf.getCardboardRenderer());
       setRenderer(getCardboardStereoRenderer());
-//
-      // Cardboard needs to run with its own loop.
-//      setRenderMode(GLSurfaceView.RENDERMODE_CONTINUOUSLY);
-//      setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
     }
 
     /*
@@ -238,54 +241,13 @@ public class PSurfaceCardboard extends PSurfaceGLES {
 
   // Android specific classes (Renderer, ConfigChooser)  
 
-//  public AndroidCardboardRenderer getCardboardRenderer() {
-//    cardboardRenderer = new AndroidCardboardRenderer();
-//    return cardboardRenderer;
-//  }
 
   public AndroidCardboardStereoRenderer getCardboardStereoRenderer() {
-    cardboardStereoRenderer = new AndroidCardboardStereoRenderer();
-    return cardboardStereoRenderer;
+    renderer = new AndroidCardboardStereoRenderer();
+    return renderer;
   }  
-  
-  protected class AndroidCardboardRenderer implements CardboardView.Renderer {
-    public AndroidCardboardRenderer() {
-    }
 
-    @Override
-    public void onDrawFrame(HeadTransform headTransform, Eye leftEye, Eye rightEye) {
-      Log.i(TAG, "onDrawFrame");
-      pgc.headTransform(headTransform);
-      if (leftEye != null) pgc.setLeftEye();
-      sketch.handleDraw();
-      if (rightEye != null) pgc.setRightEye();
-      sketch.handleDraw();      
-    }
 
-    @Override
-    public void onFinishFrame(Viewport arg0) {
-      // TODO Auto-generated method stub
-      
-    }
-
-    @Override
-    public void onRendererShutdown() {
-      // TODO Auto-generated method stub
-      
-    }
-
-    @Override
-    public void onSurfaceChanged(int iwidth, int iheight) {
-      pgl.getGL(null);
-      graphics.setSize(iwidth, iheight);     
-    }
-
-    @Override
-    public void onSurfaceCreated(EGLConfig arg0) {
-      pgl.init(null);      
-    }
-  }
- 
   protected class AndroidCardboardStereoRenderer implements CardboardView.StereoRenderer {
     public AndroidCardboardStereoRenderer() {
 
@@ -293,41 +255,31 @@ public class PSurfaceCardboard extends PSurfaceGLES {
 
 
     @Override
-    public void onNewFrame(HeadTransform headTransform) {
+    public void onNewFrame(HeadTransform transform) {
       pgl.getGL(null);
-      // TODO Auto-generated method stub
-//      pgc.headTransform(arg0);
+      pgc.headTransform(transform);
     }
 
     @Override
-    public void onDrawEye(Eye arg0) {
-//      Log.i(TAG, "onDrawEye");
-      // TODO Auto-generated method stub
-      pgc.eyeTransform(arg0);
+    public void onDrawEye(Eye eye) {
+      pgc.eyeTransform(eye);
       sketch.handleDraw();
     }
 
     @Override
     public void onFinishFrame(Viewport arg0) {
-      // TODO Auto-generated method stub
     }
 
     @Override
     public void onRendererShutdown() {
-      // TODO Auto-generated method stub
-      
     }
 
     @Override
     public void onSurfaceChanged(int arg0, int arg1) {
-      // TODO Auto-generated method stub
-      
     }
 
     @Override
     public void onSurfaceCreated(EGLConfig arg0) {
-      // TODO Auto-generated method stub
-      
     }
   }
 }
