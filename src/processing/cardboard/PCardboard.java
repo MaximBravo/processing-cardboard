@@ -67,7 +67,15 @@ public class PCardboard extends CardboardActivity implements AppComponent {
   public int getKind() {
       return CARDBOARD;
   }
+  
+  public void dispose() {
+    sketch = null;
+  }  
+  
+  public void onPermissionsGranted() {
 
+  }
+  
   public void setSketch(PApplet sketch) {
     this.sketch = sketch;
   }

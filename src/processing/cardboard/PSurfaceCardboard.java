@@ -79,8 +79,18 @@ public class PSurfaceCardboard extends PSurfaceGLES {
   }
   
   @Override
+  public Context getContext() {
+    return cardboard;
+  }
+  
+  @Override
   public Activity getActivity() {
     return cardboard;
+  }
+  
+  @Override
+  public void finish() {
+    cardboard.finish();
   }
   
   public AssetManager getAssets() {
