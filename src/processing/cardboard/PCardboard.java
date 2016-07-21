@@ -69,7 +69,6 @@ public class PCardboard extends CardboardActivity implements AppComponent {
   }
   
   public void dispose() {
-    sketch = null;
   }  
   
   public void onPermissionsGranted() {
@@ -125,8 +124,8 @@ public class PCardboard extends CardboardActivity implements AppComponent {
 
   @Override
   public void onDestroy() {
-    sketch.onDestroy();
     super.onDestroy();
+    sketch.onDestroy();    
   }
 
 
@@ -139,8 +138,8 @@ public class PCardboard extends CardboardActivity implements AppComponent {
 
   @Override
   public void onStop() {
-    sketch.onStop();
     super.onStop();
+    sketch.onStop();
   }
 
   public void requestDraw() {
