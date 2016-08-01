@@ -56,11 +56,11 @@ public class PCardboard extends CardboardActivity implements AppComponent {
     metrics = getResources().getDisplayMetrics();
   }
 
-  public int getWidth() {
+  public int getDisplayWidth() {
     return metrics.widthPixels;
   }
 
-  public int getHeight() {
+  public int getDisplayHeight() {
     return metrics.heightPixels;
   }
 
