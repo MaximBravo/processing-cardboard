@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <project name="Processing Cardboard Library" default="build">
 
-  <property name="processing.dir" value="../../git/processing" />
+  <property name="processing.dir" value="../processing" />
   <property environment="env"/>
 
   <target name="clean" description="Clean the build directories">
@@ -19,9 +19,9 @@
 
   <target name="compile" description="Compile sources">
     <condition property="core-built">
-      <available file="../../git/processing-android/android-core.zip" />
+      <available file="../processing-android/android-core.zip" />
     </condition>
-    <fail unless="core-built" message="Please build the core library first and make sure it sits in ../../git/processing-android/android-core.zip" />
+    <fail unless="core-built" message="Please build the core library first and make sure it sits in ../processing-android/android-core.zip" />
 
     <mkdir dir="bin" />
     <javac source="1.7"
@@ -29,10 +29,14 @@
 	   srcdir="src" destdir="bin"
 	   encoding="UTF-8"
 	   includeAntRuntime="false"
-	   classpath="lib/cardboard-audio-classes.jar;lib/cardboard-common-classes.jar;lib/cardboard-core-classes.jar;../../git/processing-android/android-core.zip;${env.ANDROID_SDK}/platforms/android-19/android.jar"
+	   classpath="lib/cardboard-audio-classes.jar;
+	              lib/cardboard-common-classes.jar;
+	              lib/cardboard-core-classes.jar;
+	              ../processing-android/android-core.zip;
+	              ${env.ANDROID_SDK}/platforms/android-23/android.jar"
 	   nowarn="true"
 	   compiler="org.eclipse.jdt.core.JDTCompilerAdapter">
-      <compilerclasspath path="../../git/processing/java/mode/org.eclipse.jdt.core.jar;../../git/processing/java/mode/jdtCompilerAdapter.jar" />
+      <compilerclasspath path="../processing/java/mode/org.eclipse.jdt.core.jar;../processing/java/mode/jdtCompilerAdapter.jar" />
     </javac>
   </target>
 
