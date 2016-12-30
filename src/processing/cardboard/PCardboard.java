@@ -79,6 +79,10 @@ public class PCardboard extends CardboardActivity implements AppComponent {
     this.sketch = sketch;
   }
 
+  public PApplet getSketch() {
+    return sketch;
+  }
+
   public void init(PApplet sketch) {
     setSketch(sketch);
     if (sketch != null) {
